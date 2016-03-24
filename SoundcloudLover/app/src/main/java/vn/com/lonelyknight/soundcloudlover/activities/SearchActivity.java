@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -34,6 +35,8 @@ import vn.com.lonelyknight.soundcloudlover.models.Track;
  */
 public class SearchActivity extends AppCompatActivity {
 
+    private static final String DEBUG_TAG = SearchActivity.class.getSimpleName();
+
     private static final int FRAGMENT_ALL = 0;
     private static final int FRAGMENT_PLAYLIST = 3;
 
@@ -60,7 +63,7 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void onSearchTermChanged(String s) {
-
+            //On searchTermChanged
         }
 
         @Override
@@ -68,11 +71,8 @@ public class SearchActivity extends AppCompatActivity {
             Toast.makeText(SearchActivity.this, "Searching " + searchTerm + "...", Toast.LENGTH_LONG).show();
             mCurrentSearchTerm = searchTerm;
 
-            if (mSearchViewPager.getCurrentItem() == FRAGMENT_PLAYLIST){
-                enqueuePlaylistSearchQuery(mCurrentSearchTerm);
-            }else {
-                enqueueSearchQuery(mCurrentSearchTerm);
-            }
+            enqueuePlaylistSearchQuery(mCurrentSearchTerm);
+            enqueueSearchQuery(mCurrentSearchTerm);
         }
 
         @Override
@@ -98,8 +98,6 @@ public class SearchActivity extends AppCompatActivity {
             // Trigger playlist search when Playlist tab is selected
             if (position == FRAGMENT_PLAYLIST) {
                 enqueuePlaylistSearchQuery(mCurrentSearchTerm);
-            }else {
-                enqueueSearchQuery(mCurrentSearchTerm);
             }
         }
 
@@ -180,6 +178,8 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void enqueueSearchQuery(String query) {
+        Log.d(DEBUG_TAG, "enqueueSearchQuery: query = " + query);
+
         Call<List<Track>> call_search = SoundcloudLoverApplication.getSoundcloudApiService().searchTrackByTitle(query);
         call_search.enqueue(new Callback<List<Track>>() {
             @Override
@@ -195,6 +195,8 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void enqueuePlaylistSearchQuery(String query) {
+        Log.d(DEBUG_TAG, "enqueuePlaylistSearchQuery: query = " + query);
+
         Call<List<Playlist>> call_search = SoundcloudLoverApplication.getSoundcloudApiService().searchPlaylistsByTitle(query);
         call_search.enqueue(new Callback<List<Playlist>>() {
             @Override
