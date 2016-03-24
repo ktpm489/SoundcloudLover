@@ -1,0 +1,17 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FragmentSoundcloudSearchResult"
+    tools:showIn="@layout/layout_activity_main">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_search_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:visibility="gone"/>
+
+    <include layout="@layout/layout_explore_soundcloud" />
+
+</RelativeLayout>
