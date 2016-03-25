@@ -10,6 +10,9 @@
     <dimen name="imageSizeListItem">64dp</dimen>
     <dimen name="imageview_margin">16dp</dimen>
     <dimen name="icon_margin">8dp</dimen>
+    <dimen name="text_margin">8dp</dimen>
+
+    <dimen name="icon_error_item_size">24dp</dimen>
 
     <!--<dimen name="imageview_opacity_active">0.54</dimen>-->
     <!--<dimen name="imageview_opacity_inactive">0.26</dimen>-->

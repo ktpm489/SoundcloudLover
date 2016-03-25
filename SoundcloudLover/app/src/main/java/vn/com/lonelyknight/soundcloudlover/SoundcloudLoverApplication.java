@@ -4,6 +4,9 @@ import android.app.Application;
 
 import com.squareup.otto.Bus;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import vn.com.lonelyknight.soundcloudlover.apis.SoundcloudAPIEndpoint;
@@ -26,7 +29,12 @@ public class SoundcloudLoverApplication extends Application{
 
         eventBus = new Bus();
 
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .build();
         retrofitClient = new Retrofit.Builder()
+                .client(okHttpClient)
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

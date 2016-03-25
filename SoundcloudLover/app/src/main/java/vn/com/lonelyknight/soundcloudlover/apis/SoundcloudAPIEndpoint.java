@@ -21,4 +21,7 @@ public interface SoundcloudAPIEndpoint {
     @GET("playlists?client_id=1f5a55bf4e77f8da5156edac58fe2c31&representation=compact&limit=" + DEFAULT_PAGE_SIZE)
     Call<List<Playlist>> searchPlaylistsByTitle(@Query("q") String title);
 
+    @GET("playlists?client_id=1f5a55bf4e77f8da5156edac58fe2c31&representation=compact&limit=" + DEFAULT_PAGE_SIZE)
+    Call<List<Playlist>> loadMorePlaylist(@Query("q") String title, @Query("offset") int offset);
+
 }

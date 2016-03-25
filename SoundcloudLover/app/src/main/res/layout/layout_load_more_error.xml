@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_margin="@dimen/activity_horizontal_margin"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="@dimen/icon_error_item_size"
+        android:layout_height="@dimen/icon_error_item_size"
+        android:src="@drawable/ic_internet_problem_36dp_xxhdpi"
+        android:background="@android:color/transparent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/internet_connection_problem"
+        android:layout_margin="@dimen/text_margin"
+        android:textColor="@color/colorListItemTitle"
+        android:textSize="@dimen/textSizeListItemTitle"/>
+
+</LinearLayout>

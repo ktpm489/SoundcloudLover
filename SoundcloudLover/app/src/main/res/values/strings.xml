@@ -6,4 +6,5 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="explore_soundcloud">Let\'s explore Soundcloud</string>
+    <string name="internet_connection_problem">Error occurs, please try again</string>
 </resources>

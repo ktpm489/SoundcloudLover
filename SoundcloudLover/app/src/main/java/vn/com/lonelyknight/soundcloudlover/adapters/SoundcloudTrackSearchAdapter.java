@@ -98,6 +98,10 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
         return position >= result.size() ? VIEW_PROG : VIEW_ITEM;
     }
 
+    /**
+     * Append loaded more items to the list
+     * @param moreResult : the loaded more items
+     */
     public void addMoreItems(List<Track> moreResult) {
         if (null != moreResult && moreResult.size() > 0) {
             Log.d(DEBUG_TAG, "Add more items to data source");

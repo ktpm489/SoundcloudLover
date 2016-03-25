@@ -9,16 +9,30 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import vn.com.lonelyknight.soundcloudlover.SoundcloudLoverApplication;
 import vn.com.lonelyknight.soundcloudlover.events.EventPlaylistSearchComplete;
+import vn.com.lonelyknight.soundcloudlover.events.EventPlaylistSearchLoadMoreCompleted;
+import vn.com.lonelyknight.soundcloudlover.events.EventPlaylistSearchLoadMoreError;
 import vn.com.lonelyknight.soundcloudlover.events.EventSearchComplete;
 import vn.com.lonelyknight.soundcloudlover.events.EventTrackSearchLoadMoreCompleted;
 import vn.com.lonelyknight.soundcloudlover.models.Playlist;
 import vn.com.lonelyknight.soundcloudlover.models.Track;
 
-/**
- * Created by duclm on 3/25/2016.
- */
+
 public class SoundcloudAPIRequestHelper {
     private static final String DEBUG_TAG = SoundcloudAPIRequestHelper.class.getSimpleName();
+
+    public static Call<List<Playlist>> currentPlaylistLoadMoreCall;
+
+    private static Callback<List<Playlist>> callbackPlaylist = new Callback<List<Playlist>>() {
+        @Override
+        public void onResponse(Call<List<Playlist>> call, Response<List<Playlist>> response) {
+            SoundcloudLoverApplication.eventBus.post(new EventPlaylistSearchLoadMoreCompleted(response.body()));
+        }
+
+        @Override
+        public void onFailure(Call<List<Playlist>> call, Throwable t) {
+            SoundcloudLoverApplication.eventBus.post(new EventPlaylistSearchLoadMoreError());
+        }
+    };
 
     private void enqueueSearchQuery(String query) {
         Log.d(DEBUG_TAG, "enqueueSearchQuery: query = " + query);
@@ -70,5 +84,19 @@ public class SoundcloudAPIRequestHelper {
                 Log.e(DEBUG_TAG, "requestLoadMoreTrackSearchResult failed");
             }
         });
+    }
+
+    public static void requestLoadMorePlaylistSearchResult(String query, int page){
+        Log.d(DEBUG_TAG, "requestLoadMoreTrackSearchResult: offset = " + page);
+
+        Call<List<Playlist>> call_search = SoundcloudLoverApplication.getSoundcloudApiService().loadMorePlaylist(query, page * SoundcloudAPIEndpoint.DEFAULT_PAGE_SIZE);
+        call_search.enqueue(callbackPlaylist);
+
+        // Clone call for retry later if error occurs
+        currentPlaylistLoadMoreCall = call_search.clone();
+    }
+
+    public static void retryRequestLoadingMorePlaylistResult(){
+        currentPlaylistLoadMoreCall.clone().enqueue(callbackPlaylist);
     }
 }
