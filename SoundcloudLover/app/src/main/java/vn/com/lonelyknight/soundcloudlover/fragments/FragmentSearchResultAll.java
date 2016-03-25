@@ -24,6 +24,7 @@ import vn.com.lonelyknight.soundcloudlover.adapters.SoundcloudTrackSearchAdapter
 import vn.com.lonelyknight.soundcloudlover.apis.SoundcloudAPIRequestHelper;
 import vn.com.lonelyknight.soundcloudlover.events.EventSearchComplete;
 import vn.com.lonelyknight.soundcloudlover.events.EventTrackSearchLoadMoreCompleted;
+import vn.com.lonelyknight.soundcloudlover.events.EventTrackSearchLoadMoreError;
 
 /**
  * Created by duclm on 3/23/2016.
@@ -90,7 +91,14 @@ public class FragmentSearchResultAll extends Fragment {
 
     @Subscribe
     public void onSearchCompleted(EventSearchComplete event) {
-        mRecyclerAdapter = new SoundcloudTrackSearchAdapter(mContext, event.getSearchResultData());
+        mRecyclerAdapter = new SoundcloudTrackSearchAdapter(mContext, event.getSearchResultData(), new SoundcloudTrackSearchAdapter.OnErrorViewClickListener() {
+            @Override
+            public void onErrorViewClick() {
+                mRecyclerAdapter.setLoadMoreError(false);
+                // Retry loading more search result
+                SoundcloudAPIRequestHelper.retryRequestLoadingMoreTrackResult();
+            }
+        });
         recyclerView.setAdapter(mRecyclerAdapter);
         switchSearchResultViewVisibility();
     }
@@ -99,6 +107,11 @@ public class FragmentSearchResultAll extends Fragment {
     public void onLoadMoreResultCompleted(EventTrackSearchLoadMoreCompleted event) {
         Log.d(DEBUG_TAG, "Event: onLoadMoreResult");
         mRecyclerAdapter.addMoreItems(event.getLoadMoreResult());
+    }
+
+    @Subscribe
+    public void onLoadMoreTrackError(EventTrackSearchLoadMoreError event){
+        mRecyclerAdapter.setLoadMoreError(true);
     }
 
     private void switchSearchResultViewVisibility() {

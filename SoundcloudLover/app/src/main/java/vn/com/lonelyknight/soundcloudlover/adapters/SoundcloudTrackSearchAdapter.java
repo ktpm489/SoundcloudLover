@@ -32,6 +32,14 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
 
     private static final int VIEW_ITEM = 0;
     private static final int VIEW_PROG = 1;
+    private static final int VIEW_ERROR = 2;
+
+    public interface OnErrorViewClickListener {
+        void onErrorViewClick();
+    }
+
+    private OnErrorViewClickListener onErrorViewClickListener;
+    private boolean isLoadMoreError = false;
 
     private List<Track> result;
     private Context mContext;
@@ -40,9 +48,10 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
         result = null;
     }
 
-    public SoundcloudTrackSearchAdapter(Context context, List<Track> result) {
+    public SoundcloudTrackSearchAdapter(Context context, List<Track> result, OnErrorViewClickListener listener) {
         this.mContext = context;
         this.result = result;
+        this.onErrorViewClickListener = listener;
     }
 
     @Override
@@ -53,11 +62,14 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_search_item_new, parent, false);
             vh = new ItemViewHolder(v);
-        } else {
+        } else if (VIEW_PROG == viewType) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_progressbar_load_more, parent, false);
-
             vh = new ProgressViewHolder(v);
+        } else {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.layout_load_more_error, parent, false);
+            vh = new ErrorViewHolder(v);
         }
 
         return vh;
@@ -79,6 +91,8 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
                     .into(((ItemViewHolder) holder).imgvTrackItemAvatar);
         }else if (holder instanceof ProgressViewHolder){
             ((ProgressViewHolder) holder).loadMoreProgressBar.setIndeterminate(true);
+        }else {
+            ((ErrorViewHolder) holder).bindErrorView(this.onErrorViewClickListener);
         }
     }
 
@@ -95,7 +109,13 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public int getItemViewType(int position) {
-        return position >= result.size() ? VIEW_PROG : VIEW_ITEM;
+        if (position >= result.size()) {
+            if (isLoadMoreError){
+                return VIEW_ERROR;
+            }
+            return VIEW_PROG;
+        }
+        return VIEW_ITEM;
     }
 
     /**
@@ -109,6 +129,16 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
             result.addAll(moreResult);
             notifyItemRangeInserted(currentSize, result.size() - 1);
         }
+    }
+
+    /**
+     * Set value of flag to indicate load more finished error or successfully
+     *
+     * @param error : new value of error flag
+     */
+    public void setLoadMoreError(boolean error) {
+        this.isLoadMoreError = error;
+        notifyItemChanged(result.size());
     }
 
 
@@ -140,6 +170,24 @@ public class SoundcloudTrackSearchAdapter extends RecyclerView.Adapter<RecyclerV
         public ProgressViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
+        }
+    }
+
+    public static class ErrorViewHolder extends RecyclerView.ViewHolder {
+        View errorView;
+
+        public ErrorViewHolder(View v) {
+            super(v);
+            this.errorView = v;
+        }
+
+        public void bindErrorView(final OnErrorViewClickListener listener){
+            errorView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onErrorViewClick();
+                }
+            });
         }
     }
 }

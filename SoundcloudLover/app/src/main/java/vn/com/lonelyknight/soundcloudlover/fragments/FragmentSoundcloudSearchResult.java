@@ -76,8 +76,7 @@ public class FragmentSoundcloudSearchResult extends Fragment {
 
     @Subscribe
     public void onSearchCompleted(EventSearchComplete event) {
-        mRecyclerAdapter = new SoundcloudTrackSearchAdapter(mContext, event.getSearchResultData());
-        recyclerView.setAdapter(mRecyclerAdapter);
+        recyclerView.setAdapter(null);
         switchSearchResultViewVisibility();
     }
 
