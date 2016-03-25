@@ -2,11 +2,11 @@ package vn.com.lonelyknight.soundcloudlover.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +16,21 @@ import com.squareup.otto.Subscribe;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import vn.com.lonelyknight.soundcloudlover.DividerItemDecoration;
+import vn.com.lonelyknight.soundcloudlover.EndlessRecyclerViewScrollListener;
 import vn.com.lonelyknight.soundcloudlover.R;
 import vn.com.lonelyknight.soundcloudlover.SoundcloudLoverApplication;
-import vn.com.lonelyknight.soundcloudlover.adapters.SoundcloudSearchAdapter;
+import vn.com.lonelyknight.soundcloudlover.activities.SearchActivity;
+import vn.com.lonelyknight.soundcloudlover.adapters.SoundcloudTrackSearchAdapter;
+import vn.com.lonelyknight.soundcloudlover.apis.SoundcloudAPIRequestHelper;
 import vn.com.lonelyknight.soundcloudlover.events.EventSearchComplete;
+import vn.com.lonelyknight.soundcloudlover.events.EventTrackSearchLoadMoreCompleted;
 
 /**
  * Created by duclm on 3/23/2016.
  */
 public class FragmentSearchResultAll extends Fragment {
+
+    private static final String DEBUG_TAG = FragmentSearchResultAll.class.getSimpleName();
 
     @Bind(R.id.recyclerview_search_result)
     RecyclerView recyclerView;
@@ -32,8 +38,8 @@ public class FragmentSearchResultAll extends Fragment {
     View layoutExploreSoundcloud;
 
     private Context mContext;
-    private SoundcloudSearchAdapter mRecyclerAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private SoundcloudTrackSearchAdapter mRecyclerAdapter;
+    private LinearLayoutManager mLayoutManager;
 
     public FragmentSearchResultAll() {
     }
@@ -41,7 +47,6 @@ public class FragmentSearchResultAll extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -53,6 +58,14 @@ public class FragmentSearchResultAll extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.divider)));
         recyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(mContext);
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                // Request recyclerview to display a progressbar at bottom
+                loadMoreSearchResult(page);
+            }
+        });
+
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -77,9 +90,15 @@ public class FragmentSearchResultAll extends Fragment {
 
     @Subscribe
     public void onSearchCompleted(EventSearchComplete event) {
-        mRecyclerAdapter = new SoundcloudSearchAdapter(mContext, event.getSearchResultData());
+        mRecyclerAdapter = new SoundcloudTrackSearchAdapter(mContext, event.getSearchResultData());
         recyclerView.setAdapter(mRecyclerAdapter);
         switchSearchResultViewVisibility();
+    }
+
+    @Subscribe
+    public void onLoadMoreResultCompleted(EventTrackSearchLoadMoreCompleted event) {
+        Log.d(DEBUG_TAG, "Event: onLoadMoreResult");
+        mRecyclerAdapter.addMoreItems(event.getLoadMoreResult());
     }
 
     private void switchSearchResultViewVisibility() {
@@ -87,5 +106,14 @@ public class FragmentSearchResultAll extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
             layoutExploreSoundcloud.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Loading more search result from Soundcloud
+     * @param page : pagination number
+     */
+    private void loadMoreSearchResult(int page) {
+        Log.d(DEBUG_TAG, "Current page = " + page + ", loading more items...");
+        SoundcloudAPIRequestHelper.requestLoadMoreTrackSearchResult(((SearchActivity)mContext).getCurrentSearchTerm(), page);
     }
 }

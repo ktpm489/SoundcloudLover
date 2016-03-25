@@ -114,7 +114,6 @@ public class SearchActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-
         if (mSearchViewPager != null) {
             setUpViewpager(mSearchViewPager);
         }
@@ -222,5 +221,14 @@ public class SearchActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         supportFinishAfterTransition();
+    }
+
+    /**
+     * Get current search term
+     *
+     * @return current search term get from searchbox
+     */
+    public String getCurrentSearchTerm() {
+        return this.mCurrentSearchTerm;
     }
 }

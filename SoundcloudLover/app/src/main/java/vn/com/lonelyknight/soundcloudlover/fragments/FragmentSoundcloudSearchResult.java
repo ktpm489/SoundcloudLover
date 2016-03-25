@@ -1,4 +1,4 @@
-package vn.com.lonelyknight.soundcloudlover;
+package vn.com.lonelyknight.soundcloudlover.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,7 +14,10 @@ import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import vn.com.lonelyknight.soundcloudlover.adapters.SoundcloudSearchAdapter;
+import vn.com.lonelyknight.soundcloudlover.DividerItemDecoration;
+import vn.com.lonelyknight.soundcloudlover.R;
+import vn.com.lonelyknight.soundcloudlover.SoundcloudLoverApplication;
+import vn.com.lonelyknight.soundcloudlover.adapters.SoundcloudTrackSearchAdapter;
 import vn.com.lonelyknight.soundcloudlover.events.EventSearchComplete;
 
 /**
@@ -28,7 +31,7 @@ public class FragmentSoundcloudSearchResult extends Fragment {
     View layoutExploreSoundcloud;
 
     private Context mContext;
-    private SoundcloudSearchAdapter mRecyclerAdapter;
+    private SoundcloudTrackSearchAdapter mRecyclerAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     public FragmentSoundcloudSearchResult() {
@@ -73,7 +76,7 @@ public class FragmentSoundcloudSearchResult extends Fragment {
 
     @Subscribe
     public void onSearchCompleted(EventSearchComplete event) {
-        mRecyclerAdapter = new SoundcloudSearchAdapter(mContext, event.getSearchResultData());
+        mRecyclerAdapter = new SoundcloudTrackSearchAdapter(mContext, event.getSearchResultData());
         recyclerView.setAdapter(mRecyclerAdapter);
         switchSearchResultViewVisibility();
     }
